@@ -87,17 +87,24 @@ pipeline {
                 }
             }
         }
-        
-        stage('Docker deploy') {
-            steps {
-                script {
-                withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
-                 sh "docker run -d -p 3000:3000 hemanthreddy00992/yelpcamp:latest"
-                    }
-                }
-            }
-        }
-        
+
+// If Want to deploy to docker itself
+//////////////////////////////////////////////////////////////////
+    //    stage('Docker deploy') {
+    //        steps {
+    //            script {
+    //            withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+    //             sh "docker run -d -p 3000:3000 hemanthreddy00992/yelpcamp:latest"
+    //                }
+    //            }
+    //        }
+    //    }
+
+//////////////////////////////////////////////////////////////////
+
+
+
+
         
         
     }
