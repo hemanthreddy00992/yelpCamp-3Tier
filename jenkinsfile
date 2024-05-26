@@ -1,0 +1,93 @@
+pipeline {
+    agent any
+    tools {
+        nodejs "node21"
+    }
+
+    environment {
+        SCANNER_HOME= tool 'sonar-scanner'
+        CLOUDINARY_CLOUD_NAME='di286ivi1'
+        CLOUDINARY_KEY='371447148372964'
+        CLOUDINARY_SECRET='z-8md45jESZM_CQy7-K2mZ0Et5Y'
+        MAPBOX_TOKEN='sk.eyJ1IjoiaGVtYW50aHJlZGR5MDA5OTIiLCJhIjoiY2x3bHE3NGpxMDdvYzJqcnplbnR1bndtaCJ9.pc-F_NH01TS7tU9GubVqEA'
+        DB_URL='mongodb+srv://hemanthreddy00992:2kC6nYWEqTZb9KOo@itshemanth.yb5dgsg.mongodb.net/?retryWrites=true&w=majority&appName=itshemanth'
+        SECRET='itshemanth'
+
+    }
+
+    stages {
+        stage('Git checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/hemanthreddy00992/yelpCamp-3Tier.git'
+            }
+        }
+        
+        stage('Install dependencies') {
+            steps {
+                sh "npm install"
+            }
+        }
+        
+        stage('Unit test cases') {
+            steps {
+                sh "npm test"
+            }
+        }
+        
+        stage('Trivy FS scan') {
+            steps {
+                sh "trivy fs --format table -o fs-report.html ."
+            }
+        }
+        
+        stage('Sonarqube Analysys') {
+            steps {
+                
+                withSonarQubeEnv('sonar') {
+                    sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=yelpcamp -Dsonar.prrojectName=yelpcamp"
+                    }
+            }
+        }
+        
+         stage('Docker build and tag') {
+            steps {
+                script {
+                withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                 sh "docker build -t hemanthreddy00992/yelpcamp:latest ."
+                    }
+                }
+            }
+        }
+        
+        
+         stage('trivy Image scan') {
+            steps {
+                sh "trivy image --format table -o image-report.html hemanthreddy00992/yelpcamp:latest"
+            }
+        }
+        
+        stage('Docker push') {
+            steps {
+                script {
+                withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                 sh "docker push hemanthreddy00992/yelpcamp:latest"
+                    }
+                }
+            }
+        }
+        
+        stage('Docker deploy') {
+            steps {
+                script {
+                withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                 sh "docker run -d -p 3000:3000 hemanthreddy00992/yelpcamp:latest"
+                    }
+                }
+            }
+        }
+        
+        
+        
+    }
+    
+}
