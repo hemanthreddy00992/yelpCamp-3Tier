@@ -1,1 +1,80 @@
-here secret, deployment and service
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: yelp-camp-secrets
+type: Opaque
+data:
+  CLOUDINARY_CLOUD_NAME: ZGkyODZpdmkxCg==
+  CLOUDINARY_KEY: MzcxNDQ3MTQ4MzcyOTY0Cg==
+  CLOUDINARY_SECRET: ei04bWQ0NWpFU1pNX0NReTctSzJtWjBFdDVZCg==
+  MAPBOX_TOKEN: c2suZXlKMUlqb2lhR1Z0WVc1MGFISmxaR1I1TURBNU9USWlMQ0poSWpvaVkyeDNiSEUzTkdweE1EZHZZekpxY25wbGJuUjFibmR0YUNKOS5wYy1GX05IMDFUUzd0VTlHdWJWcUVBCg==
+  DB_URL: bW9uZ29kYitzcnY6Ly9oZW1hbnRocmVkZHkwMDk5Mjoya0M2bllXRXFUWmI5S09vQGl0c2hlbWFudGgueWI1ZGdzZy5tb25nb2RiLm5ldC8/cmV0cnlXcml0ZXM9dHJ1ZSZ3PW1ham9yaXR5JmFwcE5hbWU9aXRzaGVtYW50aAo=
+  SECRET: aXRzaGVtYW50aAo=
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yelp-camp-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yelp-camp
+  template:
+    metadata:
+      labels:
+        app: yelp-camp
+    spec:
+      containers:
+        - name: yelp-camp-container
+          image: hemanthreddy00992/yelpcamp:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: CLOUDINARY_CLOUD_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: yelp-camp-secrets
+                  key: CLOUDINARY_CLOUD_NAME
+            - name: CLOUDINARY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: yelp-camp-secrets
+                  key: CLOUDINARY_KEY
+            - name: CLOUDINARY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: yelp-camp-secrets
+                  key: CLOUDINARY_SECRET
+            - name: MAPBOX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: yelp-camp-secrets
+                  key: MAPBOX_TOKEN
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: yelp-camp-secrets
+                  key: DB_URL
+            - name: SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: yelp-camp-secrets
+                  key: SECRET
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yelp-camp-service
+spec:
+  selector:
+    app: yelp-camp
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: LoadBalancer
