@@ -2,6 +2,9 @@
 
 YelpCamp is a full-stack web application for exploring and booking campgrounds. It allows users to discover new camping destinations, share their experiences, and connect with fellow outdoor enthusiasts.
 
+<img width="771" alt="Screenshot 2024-05-29 at 10 49 40 PM" src="https://github.com/hemanthreddy00992/yelpCamp-3Tier/assets/130210051/10efc50a-b8dc-4a63-994e-e8618234e2ab">
+
+
 ## Features
 
 - **User Authentication:** Users can register an account and securely log in to access personalized features.
